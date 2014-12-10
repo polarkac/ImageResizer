@@ -1,6 +1,6 @@
 import os
 
-import PIL
+from PIL import Image
 
 def createWorkingDirectories(folderPath):
     os.mkdir(os.path.join(folderPath, 'original'))
@@ -11,6 +11,16 @@ def iterateThroughImages(folderPath, minimumSize=(1920, 1080)):
         image for image in os.listdir(folderPath)
         if os.path.isfile(os.path.join(folderPath, image))
     ]
+    for imageFile in imageFiles:
+        try:
+            image = Image.open(os.path.join(folderPath, imageFile))
+        except OSError:
+            continue
+
+        resizeImage(image, folderPath, minimumSize)
+
+def resizeImage(image, folderPath, minimumSize):
+    pass
 
 if __name__ == '__main__':
     folderPath = None
@@ -24,14 +34,18 @@ if __name__ == '__main__':
     minImageSize = ()
     while len(minImageSize) != 2:
         inputSize = input('Minimum image size (1920x1080): ')
-        inputSize = tuple(inputSize.split('x'))
+        if not inputSize:
+            inputSize = (1920, 1080)
+        else:
+            inputSize = tuple(inputSize.split('x'))
         try:
             width = int(inputSize[0])
             height = int(inputSize[1])
             if width <= 0 or height <= 0:
                 raise ValueError
             minImageSize = (width, height)
-        except (IndexError, ValueError):
+        except (IndexError, ValueError) as e:
+            print(e)
             print('You have to type valid size!')
 
     try:
