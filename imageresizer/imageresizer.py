@@ -13,14 +13,22 @@ def iterateThroughImages(folderPath, minimumSize=(1920, 1080)):
     ]
     for imageFile in imageFiles:
         try:
-            image = Image.open(os.path.join(folderPath, imageFile))
+            resizeImage(imageFile, folderPath, minimumSize)
         except OSError:
             continue
 
-        resizeImage(image, folderPath, minimumSize)
+def resizeImage(imageFile, folderPath, minimumSize):
+    image = Image.open(os.path.join(folderPath, imageFile))
+    imageSize = image.size
+    if imageSize[0] < imageSize[1] or imageSize[0] >= minimumSize[0]:
+        image.save(os.path.join(folderPath, 'original', imageFile))
+        return
 
-def resizeImage(image, folderPath, minimumSize):
-    pass
+    aspectRatio = imageSize[0] / imageSize[1]
+    newHeight = int(minimumSize[0] / aspectRatio)
+    resizedImage = image.resize((minimumSize[0], newHeight))
+    resizedImage.save(os.path.join(folderPath, 'resized', imageFile))
+
 
 if __name__ == '__main__':
     folderPath = None
