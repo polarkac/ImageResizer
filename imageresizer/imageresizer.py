@@ -2,8 +2,15 @@ import os
 
 import PIL
 
+def createWorkingDirectories(folderPath):
+    os.mkdir(os.path.join(folderPath, 'original'))
+    os.mkdir(os.path.join(folderPath, 'resized'))
+
 def iterateThroughImages(folderPath, minimumSize=(1920, 1080)):
-    pass
+    imageFiles = [
+        image for image in os.listdir(folderPath)
+        if os.path.isfile(os.path.join(folderPath, image))
+    ]
 
 if __name__ == '__main__':
     folderPath = None
@@ -27,4 +34,11 @@ if __name__ == '__main__':
         except (IndexError, ValueError):
             print('You have to type valid size!')
 
+    try:
+        createWorkingDirectories(folderPath)
+    except OSError:
+        print('Folders \'original\' or \'resized\' already exists in given path.')
+        shouldContinue = input('Should we continue (yes, no): ')
+        if shouldContinue != 'yes':
+            exit()
     iterateThroughImages(folderPath, minImageSize)
