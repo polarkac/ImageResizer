@@ -1,4 +1,5 @@
 import os
+import sys
 
 from PIL import Image
 
@@ -11,16 +12,26 @@ def iterateThroughImages(folderPath, minimumSize=(1920, 1080)):
         image for image in os.listdir(folderPath)
         if os.path.isfile(os.path.join(folderPath, image))
     ]
-    for imageFile in imageFiles:
+    numberOfImages = len(imageFiles)
+    for i, imageFile in enumerate(imageFiles):
+        sys.stdout.write(
+            '[' + str(i + 1) + '/' + str(numberOfImages) + '] Processing '
+            + imageFile
+        )
+        sys.stdout.flush()
         try:
             resizeImage(imageFile, folderPath, minimumSize)
         except OSError:
+            sys.stdout.write(' (not image)\n')
+            sys.stdout.flush()
             continue
 
 def resizeImage(imageFile, folderPath, minimumSize):
     image = Image.open(os.path.join(folderPath, imageFile))
     imageSize = image.size
     if imageSize[0] < imageSize[1] or imageSize[0] >= minimumSize[0]:
+        sys.stdout.write(' (copied)\n')
+        sys.stdout.flush()
         image.save(os.path.join(folderPath, 'original', imageFile))
         return
 
@@ -28,7 +39,8 @@ def resizeImage(imageFile, folderPath, minimumSize):
     newHeight = int(minimumSize[0] / aspectRatio)
     resizedImage = image.resize((minimumSize[0], newHeight))
     resizedImage.save(os.path.join(folderPath, 'resized', imageFile))
-
+    sys.stdout.write(' (resized)\n')
+    sys.stdout.flush()
 
 if __name__ == '__main__':
     folderPath = None
